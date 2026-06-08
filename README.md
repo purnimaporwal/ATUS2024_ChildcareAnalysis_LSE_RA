@@ -78,7 +78,8 @@ All outputs are saved to the output/ folder when the script is run.
 
 | File | Description |
 |------|-------------|
-| ATUS2024_Codebook.tex | Variable codebook documenting all selected variables, activity classifications, and methodological decisions for M1 and M2 |
+ ATUS2024_Codebook.tex | Variable codebook — LaTeX source |
+| ATUS2024_Codebook.pdf | Variable codebook — compiled PDF; documents all selected variables, activity classifications, and methodological decisions for M1 and M2 |
 
 ---
 
