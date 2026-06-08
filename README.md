@@ -46,7 +46,7 @@ R version 4.0 or above. Install required packages once by running:
 ## How to Run
 1. Open ATUS_RA_LSE.Rproj in RStudio — this sets the working directory automatically via the here package
 2. Open ATUS2024_ChildcareAnalysis_Porwal.r
-3. Run the script from top to bottom (For Mac Users: Cmd+return; For Android Users: Ctrl+A then Ctrl+Enter)
+3. Run the script from top to bottom (Mac: Cmd+A then Cmd+Return; Windows: Ctrl+A then Ctrl+Enter)
 4. All outputs are saved automatically to the output/ folder
 
 Note: the install.packages() lines at the top only need to be run once. Comment them out after the first run.
