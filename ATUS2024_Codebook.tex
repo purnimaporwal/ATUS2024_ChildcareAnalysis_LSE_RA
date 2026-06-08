@@ -1,0 +1,1178 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.2cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue!60!black, urlcolor=blue!60!black,
+            pdftitle={ATUS 2024 Variable Codebook},
+            pdfauthor={Purnima Porwal}]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{titletoc}
+
+% ── Colours ──────────────────────────────────────────────────────────────────
+\definecolor{headerblue}{RGB}{31, 73, 125}
+\definecolor{lightblue}{RGB}{213, 228, 243}
+\definecolor{rowgray}{RGB}{248, 248, 248}
+\definecolor{subseccolor}{RGB}{60, 100, 160}
+
+% ── Column type ───────────────────────────────────────────────────────────────
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% ── Section formatting ────────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{headerblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{subseccolor}}{}{0em}{}
+\titleformat{\subsubsection}{\small\bfseries\itshape\color{subseccolor}}{}{0em}{}
+
+% ── Page headers ──────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gray}ATUS 2024 --- Variable Codebook}
+\fancyhead[R]{\small\color{gray}Purnima Porwal}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── tcolorbox note style ──────────────────────────────────────────────────────
+\tcbset{notebox/.style={colback=lightblue!40, colframe=headerblue,
+        boxrule=0.5pt, arc=3pt, left=6pt, right=6pt, top=4pt, bottom=4pt}}
+
+% ── Longtable default header / footer ─────────────────────────────────────────
+% (each table defines its own \endhead / \endfoot inline)
+
+\setlength{\LTpre}{4pt}
+\setlength{\LTpost}{4pt}
+
+%%%════════════════════════════════════════════════════════════════════════════
+\begin{document}
+%%%════════════════════════════════════════════════════════════════════════════
+
+%% ── Title block ──────────────────────────────────────────────────────────────
+\begin{center}
+{\LARGE\bfseries\color{headerblue}ATUS 2024 --- Variable Codebook}\\[6pt]
+{\large American Time Use Survey, 2024}\\[4pt]
+{\normalsize LSE Research Assistant Application $\cdot$ Part 2: Data Task}\\[4pt]
+{\normalsize Purnima Porwal \quad|\quad June 2026}
+\end{center}
+\vspace{6pt}\hrule\vspace{10pt}
+
+\begin{tcolorbox}[notebox]
+\textbf{Note on variable documentation.}
+Variable labels were extracted from the ATUS 2024 Stata \texttt{.do} files
+(\texttt{atusresp\_2024.do}, \texttt{atusact\_2024.do}, etc.) and verified
+against the official BLS data dictionary (\texttt{atus\_int\_codebk24.pdf}).
+Reading Stata \texttt{.do} files in R is the equivalent of Stata's variable
+labelling system: every variable name, what it measures, and what its values
+mean is documented there. I used Claude (Anthropic) to assist with extracting
+and organising the variable labels from these source files.
+\end{tcolorbox}
+
+\vspace{6pt}
+\textbf{Five ATUS files used in this analysis:}
+\begin{itemize}[nosep, leftmargin=1.4em]
+  \item \texttt{atusresp\_2024.dat} --- Respondent file (175 variables, 7{,}669 obs.)
+  \item \texttt{atusrost\_2024.dat} --- Roster file (8 variables)
+  \item \texttt{atusact\_2024.dat} --- Activity file (30 variables)
+  \item \texttt{atuswho\_2024.dat} --- Who file (5 variables)
+  \item \texttt{atussum\_2024.dat} --- Activity Summary file (396 variables, 7{,}669 obs.)
+\end{itemize}
+
+\smallskip
+\textbf{Primary merge key:} \texttt{TUCASEID} (14-digit case ID, present in all five files).\\
+\textbf{Activity-level merge key:} \texttt{TUACTIVITY\_N} (links \texttt{act} $\leftrightarrow$ \texttt{who}).\\
+\textbf{Person-level merge key:} \texttt{TULINENO} (links \texttt{who} $\leftrightarrow$ \texttt{rost}).
+
+\tableofcontents
+\newpage
+
+%%%════════════════════════════════════════════════════════════════════════════
+\section{Respondent File (\texttt{atusresp\_2024.dat}) --- 175 Variables}
+%%%════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[notebox]
+One row per respondent (7{,}669 rows). Contains demographic, labour force,
+earnings, family structure, and pre-computed time-use summary variables.
+\textbf{Key variables for this analysis:} \texttt{TUCASEID} (merge key),
+\texttt{TELFS} (employment status), \texttt{TUFINLWGT} (survey weight),
+\texttt{TRCHILDNUM} (number of HH children), \texttt{TRTCC} (BLS secondary
+childcare), \texttt{TUDIARYDAY} (diary day of week).
+\end{tcolorbox}
+
+%% ── Identifiers ──────────────────────────────────────────────────────────────
+\subsection{Identifiers}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUCASEID}   & ATUS Case ID (14-digit identifier) \\
+\rowcolor{rowgray} \texttt{TULINENO}   & ATUS person line number \\
+\texttt{TUYEAR}     & Year of diary day \\
+\rowcolor{rowgray} \texttt{TUMONTH}    & Month of diary day \\
+\texttt{TUDIARYDATE}& Date of diary day \\
+\rowcolor{rowgray} \texttt{TUDIARYDAY} & Day of the week of diary day (1=Sunday \ldots\ 7=Saturday) \\
+\texttt{TRHOLIDAY}  & Flag: diary day was a holiday \\
+\end{longtable}
+
+%% ── Labour force status ───────────────────────────────────────────────────────
+\subsection{Labour Force Status (Edited)}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TELFS}    & Labour force status (1=Employed at work, 2=Employed absent,
+                    3=Unemployed on layoff, 4=Unemployed looking, 5=Not in labour
+                    force) \\
+\rowcolor{rowgray} \texttt{TEHRFTPT} & Works more than 35 hours per week? \\
+\texttt{TEHRUSL1} & Usual hours per week at main job \\
+\rowcolor{rowgray} \texttt{TEHRUSL2} & Usual hours per week at other job(s) \\
+\texttt{TEHRUSLT} & Total usual hours per week (\texttt{TEHRUSL1} +
+                    \texttt{TEHRUSL2}) \\
+\rowcolor{rowgray} \texttt{TRDPFTPT} & Full time or part time status of respondent \\
+\texttt{TEMJOT}   & Had more than one job in last 7 days? \\
+\rowcolor{rowgray} \texttt{TUFWK}    & Did any work for pay or profit in last 7 days? \\
+\texttt{TUABSOT}  & Had a job (full or part time) in last 7 days? \\
+\end{longtable}
+
+%% ── Earnings ─────────────────────────────────────────────────────────────────
+\subsection{Earnings}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TEERN}    & Total weekly earnings incl.\ overtime, tips, commissions \\
+\rowcolor{rowgray} \texttt{TEERNH1O} & Hourly rate of pay, main job (excl.\ overtime/tips) \\
+\texttt{TEERNH2}  & Hourly rate of pay, main job (excl.\ overtime/tips) --- alternate \\
+\rowcolor{rowgray} \texttt{TEERNHRO} & Usual hours per week at this hourly rate \\
+\texttt{TEERNHRY} & Paid hourly or not (1=Hourly, 2=Not hourly) \\
+\rowcolor{rowgray} \texttt{TEERNPER} & Easiest pay reporting period (1=Hourly \ldots\ 6=Annually) \\
+\texttt{TEERNRT}  & Paid at hourly rate on this job? \\
+\rowcolor{rowgray} \texttt{TEERNUOT} & Usually receives overtime, tips, or commissions? \\
+\texttt{TEERNWKP} & How many weeks per year paid? \\
+\rowcolor{rowgray} \texttt{TRERNHLY} & Hourly earnings at main job \\
+\texttt{TRERNWA}  & Weekly earnings at main job \\
+\rowcolor{rowgray} \texttt{TRERNUPD} & Earnings update flag (0=Carried forward, 1=Updated in ATUS) \\
+\texttt{TRHERNAL} & \texttt{TRERNHLY} allocation flag \\
+\rowcolor{rowgray} \texttt{TRWERNAL} & \texttt{TRERNWA} allocation flag \\
+\texttt{TUERN2}   & Weekly overtime earnings \\
+\rowcolor{rowgray} \texttt{TUERNH1C} & Hourly rate of pay, excluding overtime, tips, commissions \\
+\texttt{TTHR}     & Hourly pay topcode flag \\
+\rowcolor{rowgray} \texttt{TTOT}     & Overtime amount topcode flag \\
+\texttt{TTWK}     & Weekly earnings topcode flag \\
+\end{longtable}
+
+%% ── Job and industry ─────────────────────────────────────────────────────────
+\subsection{Job and Industry}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TEIO1COW} & Class of worker --- main job (1=Govt Federal \ldots\
+                    8=Without pay) \\
+\rowcolor{rowgray} \texttt{TEIO1ICD} & Industry code, main job \\
+\texttt{TEIO1OCD} & Occupation code, main job \\
+\rowcolor{rowgray} \texttt{TRDTIND1} & Detailed industry recode, main job \\
+\texttt{TRDTOCC1} & Detailed occupation recode, main job \\
+\rowcolor{rowgray} \texttt{TRIMIND1} & Intermediate industry recode, main job \\
+\texttt{TRMJIND1} & Major industry recode, main job \\
+\rowcolor{rowgray} \texttt{TRMJOCC1} & Major occupation recode, main job \\
+\texttt{TRMJOCGR} & Major occupation category, main job \\
+\rowcolor{rowgray} \texttt{TUIO1MFG} & Business type: manufacturing/retail/wholesale/other? \\
+\texttt{TUIODP1}  & Still work for same employer as at CPS interview? \\
+\rowcolor{rowgray} \texttt{TUIODP2}  & Job activities changed since CPS interview? \\
+\texttt{TUIODP3}  & Still same occupation as reported at CPS? \\
+\end{longtable}
+
+%% ── Layoff and job search ────────────────────────────────────────────────────
+\subsection{Layoff and Job Search}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TEABSRSN}   & Main reason absent from job last week \\
+\rowcolor{rowgray} \texttt{TELAYAVL}   & Could have returned to work if recalled in last 7 days? \\
+\texttt{TELAYLK}    & Looking for work even while expecting recall? \\
+\rowcolor{rowgray} \texttt{TELKAVL}    & Could have started a job if offered in last 7 days? \\
+\texttt{TELKM1}     & First job search method used in last 4 weeks \\
+\rowcolor{rowgray} \texttt{TULAY}      & On layoff in last 7 days? \\
+\texttt{TULAY6M}    & Given indication of recall within 6 months? \\
+\rowcolor{rowgray} \texttt{TULAYAVR}   & Why could not start a job last week? \\
+\texttt{TULAYDT}    & Employer given date to return? \\
+\rowcolor{rowgray} \texttt{TULK}       & Doing anything to find work in last 4 weeks? \\
+\texttt{TULKAVR}    & Why could not start a job last week? \\
+\rowcolor{rowgray} \texttt{TULKDK1--6} & Detailed job search methods (6 follow-up questions) \\
+\texttt{TULKM2--6}  & Additional job search methods (5 follow-up questions) \\
+\rowcolor{rowgray} \texttt{TULKPS1--6} & Job search method details (6 follow-up questions) \\
+\texttt{TERET1}     & Currently wants a job (full or part time)? \\
+\rowcolor{rowgray} \texttt{TURETOT}    & Still retired (vs.\ CPS report)? \\
+\end{longtable}
+
+%% ── Education and school ─────────────────────────────────────────────────────
+\subsection{Education and School}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TESCHENR} & Enrolled in high school, college, or university? \\
+\rowcolor{rowgray} \texttt{TESCHFT}  & Enrolled full time or part time? \\
+\texttt{TESCHLVL} & High school or college/university? \\
+\end{longtable}
+
+%% ── Children in household ────────────────────────────────────────────────────
+\subsection{Children in Household}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TRCHILDNUM}  & Number of own household children under 18.
+                       \textbf{Negative values = item not collected; recode as
+                       \texttt{NA} before analysis.} \\
+\rowcolor{rowgray} \texttt{TRHHCHILD}   & Presence of household children under 18 (1=Yes, 2=No) \\
+\texttt{TROHHCHILD}  & Presence of own household children under 18 \\
+\rowcolor{rowgray} \texttt{TRNHHCHILD}  & Presence of own non-household children under 18 \\
+\texttt{TRNUMHOU}    & Number of people living in respondent's household \\
+\rowcolor{rowgray} \texttt{TRYHHCHILD}  & Age of youngest household child under 18 \\
+\texttt{TRHOLIDAY}   & Diary day was a holiday \\
+\end{longtable}
+
+%% ── Spouse / partner ─────────────────────────────────────────────────────────
+\subsection{Spouse / Partner}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TRSPPRES}    & Spouse or unmarried partner present in household \\
+\rowcolor{rowgray} \texttt{TRSPFTPT}    & Spouse/partner full or part time employment status \\
+\texttt{TESPEMPNOT}  & Employment status of spouse/partner \\
+\rowcolor{rowgray} \texttt{TESPUHRS}    & Usual hours of work of spouse/partner \\
+\texttt{TUSPABS}     & Spouse/partner had a job in last 7 days? \\
+\rowcolor{rowgray} \texttt{TUSPUSFT}    & Spouse/partner usually works 35+ hours per week? \\
+\texttt{TUSPWK}      & Spouse/partner did work for pay in last 7 days? \\
+\end{longtable}
+
+%% ── Secondary childcare ──────────────────────────────────────────────────────
+\subsection{Secondary Childcare (BLS Pre-computed)}
+
+\begin{tcolorbox}[notebox]
+\small Secondary childcare = respondent was doing something else as the primary
+activity but was simultaneously responsible for a child.
+\textbf{Important distinction:} \texttt{TRTCC} (two C's) = BLS secondary
+childcare for HH and own non-HH children under 13 --- this is the childcare
+variable used as M4 in this analysis.
+\texttt{TRTCCC} (three C's) = time with customers, clients, and co-workers;
+it is \emph{not} a childcare measure. Verify labels against the
+\texttt{.do} file before use.
+\end{tcolorbox}
+
+\begin{longtable}{L{3.8cm} L{10.7cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TRTCC}         & Secondary childcare --- HH and own non-HH children under 13 \\
+\rowcolor{rowgray} \texttt{TRTCCC}        & Time with customers, clients, co-workers (non-work) \\
+\texttt{TRTCCC\_WK}    & Time with customers, clients, co-workers (work + non-work) \\
+\rowcolor{rowgray} \texttt{TRTCCTOT}      & Secondary childcare --- all children under 13 \\
+\texttt{TRTCHILD}      & Time with HH or non-HH children under 18 \\
+\rowcolor{rowgray} \texttt{TRTCOC}        & Secondary childcare --- non-own, non-HH children under 13 \\
+\texttt{TRTHH}         & Secondary childcare --- HH children under 13 \\
+\rowcolor{rowgray} \texttt{TRTNOHH}       & Secondary childcare --- non-own HH children under 13 \\
+\texttt{TRTO}          & Secondary childcare --- own children under 13 \\
+\rowcolor{rowgray} \texttt{TRTOHH}        & Secondary childcare --- own HH children under 13 \\
+\texttt{TRTONHH}       & Secondary childcare --- own non-HH children under 13 \\
+\rowcolor{rowgray} \texttt{TRTOHHCHILD}   & Time with own HH children under 18 \\
+\texttt{TRTONHHCHILD}  & Time with own non-HH children under 18 \\
+\rowcolor{rowgray} \texttt{TRTNOCHILD}    & Time with non-own children under 18 \\
+\end{longtable}
+
+%% ── Time with others ─────────────────────────────────────────────────────────
+\subsection{Time With Others (BLS Pre-computed)}
+\begin{longtable}{L{3.8cm} L{10.7cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TRTALONE}      & Nonwork time spent alone (minutes) \\
+\rowcolor{rowgray} \texttt{TRTALONE\_WK}  & Work + nonwork time spent alone (minutes) \\
+\texttt{TRTEC}         & Time providing eldercare (minutes) \\
+\rowcolor{rowgray} \texttt{TRTFAMILY}     & Time with family members \\
+\texttt{TRTFRIEND}     & Time with friends \\
+\rowcolor{rowgray} \texttt{TRTHHFAMILY}   & Time with household family members \\
+\texttt{TRTSPONLY}     & Time with spouse only \\
+\rowcolor{rowgray} \texttt{TRTSPOUSE}     & Time with spouse (others may be present) \\
+\texttt{TRTUNMPART}    & Time with unmarried partner (others may be present) \\
+\end{longtable}
+
+%% ── Eldercare ────────────────────────────────────────────────────────────────
+\subsection{Eldercare}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUELDER}  & Provided care/assistance to ageing adult since reference month? \\
+\rowcolor{rowgray} \texttt{TUECYTD}  & Provided eldercare yesterday? \\
+\texttt{TUELFREQ} & How often provided eldercare? \\
+\rowcolor{rowgray} \texttt{TUELNUM}  & How many people received eldercare? \\
+\texttt{TRTEC}    & Total eldercare minutes \\
+\end{longtable}
+
+%% ── Childcare questions ──────────────────────────────────────────────────────
+\subsection{Childcare Questions (Diary Day)}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUCC2}     & Time first HH child under 13 woke up \\
+\rowcolor{rowgray} \texttt{TUCC4}     & Time last HH child under 13 went to bed \\
+\texttt{TUCC5\_CK} & Why no secondary childcare reported for own HH children? \\
+\rowcolor{rowgray} \texttt{TUCC5B\_CK}& Why no secondary childcare reported for non-own HH children? \\
+\texttt{TUCC9}     & Non-own, non-HH children cared for --- related to respondent? \\
+\end{longtable}
+
+%% ── Disability ───────────────────────────────────────────────────────────────
+\subsection{Disability}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUDIS}  & Disability status (vs.\ CPS report) \\
+\rowcolor{rowgray} \texttt{TUDIS1} & Disability prevents accepting work in next 6 months? \\
+\texttt{TUDIS2} & Has disability preventing work in next 6 months? \\
+\end{longtable}
+
+%% ── Business / farm ──────────────────────────────────────────────────────────
+\subsection{Business / Farm}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUBUS}       & Anyone in HH owns a business or farm? \\
+\rowcolor{rowgray} \texttt{TUBUS1}      & Did unpaid work in family business/farm in last 7 days? \\
+\texttt{TUBUS2OT}    & Receives payments or profits from the business? \\
+\rowcolor{rowgray} \texttt{TUBUSL1--4}  & \texttt{TULINENO} of business/farm owner (up to 4 owners) \\
+\end{longtable}
+
+%% ── Weights and flags ────────────────────────────────────────────────────────
+\subsection{Weights and Flags}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUFINLWGT} & ATUS final person weight --- use for all population estimates \\
+\rowcolor{rowgray} \texttt{TRLVMODR}  & Leave module respondent (0=Eligible but did not complete,
+                     1=Completed) \\
+\end{longtable}
+
+%% ── Allocation flags ─────────────────────────────────────────────────────────
+\subsection{Allocation Flags (TX prefix)}
+
+\begin{tcolorbox}[notebox]
+\small These 38 variables indicate whether the corresponding \texttt{TE}/\texttt{TR}
+variable was edited or allocated by BLS.
+Values: 0=No change, 10=Value to Value, 11=Blank to Value, 40=Allocated.
+\end{tcolorbox}
+
+\begin{longtable}{L{3.8cm} L{10.7cm}}
+\toprule \textbf{Allocation flag} & \textbf{Corresponds to} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TXABSRSN}   & \texttt{TEABSRSN} \\
+\rowcolor{rowgray} \texttt{TXERN}      & \texttt{TEERN} \\
+\texttt{TXERNH1O}   & \texttt{TEERNH1O} \\
+\rowcolor{rowgray} \texttt{TXERNH2}    & \texttt{TEERNH2} \\
+\texttt{TXERNHRO}   & \texttt{TEERNHRO} \\
+\rowcolor{rowgray} \texttt{TXERNHRY}   & \texttt{TEERNHRY} \\
+\texttt{TXERNPER}   & \texttt{TEERNPER} \\
+\rowcolor{rowgray} \texttt{TXERNRT}    & \texttt{TEERNRT} \\
+\texttt{TXERNUOT}   & \texttt{TEERNUOT} \\
+\rowcolor{rowgray} \texttt{TXERNWKP}   & \texttt{TEERNWKP} \\
+\texttt{TXHRFTPT}   & \texttt{TEHRFTPT} \\
+\rowcolor{rowgray} \texttt{TXHRUSL1}   & \texttt{TEHRUSL1} \\
+\texttt{TXHRUSL2}   & \texttt{TEHRUSL2} \\
+\rowcolor{rowgray} \texttt{TXHRUSLT}   & \texttt{TEHRUSLT} \\
+\texttt{TXIO1COW}   & \texttt{TEIO1COW} \\
+\rowcolor{rowgray} \texttt{TXIO1ICD}   & \texttt{TEIO1ICD} \\
+\texttt{TXIO1OCD}   & \texttt{TEIO1OCD} \\
+\rowcolor{rowgray} \texttt{TXLAYAVL}   & \texttt{TELAYAVL} \\
+\texttt{TXLAYLK}    & \texttt{TELAYLK} \\
+\rowcolor{rowgray} \texttt{TXLFS}      & \texttt{TELFS} \\
+\texttt{TXLKAVL}    & \texttt{TELKAVL} \\
+\rowcolor{rowgray} \texttt{TXLKM1}     & \texttt{TELKM1} \\
+\texttt{TXMJOT}     & \texttt{TEMJOT} \\
+\rowcolor{rowgray} \texttt{TXRET1}     & \texttt{TERET1} \\
+\texttt{TXSCHENR}   & \texttt{TESCHENR} \\
+\rowcolor{rowgray} \texttt{TXSCHFT}    & \texttt{TESCHFT} \\
+\texttt{TXSCHLVL}   & \texttt{TESCHLVL} \\
+\rowcolor{rowgray} \texttt{TXSPEMPNOT} & \texttt{TESPEMPNOT} \\
+\texttt{TXSPUHRS}   & \texttt{TESPUHRS} \\
+\rowcolor{rowgray} \texttt{TXTCC}      & \texttt{TRTCC} + \texttt{TRTCC\_LN} \\
+\texttt{TXTCCTOT}   & \texttt{TRTCCTOT} + \texttt{TRTCCTOT\_LN} \\
+\rowcolor{rowgray} \texttt{TXTCOC}     & \texttt{TRTCOC} + \texttt{TRTCOC\_LN} \\
+\texttt{TXTHH}      & \texttt{TRTHH} + \texttt{TRTHH\_LN} \\
+\rowcolor{rowgray} \texttt{TXTNOHH}    & \texttt{TRTNOHH} + \texttt{TRTNOHH\_LN} \\
+\texttt{TXTO}       & \texttt{TRTO} + \texttt{TRTO\_LN} \\
+\rowcolor{rowgray} \texttt{TXTOHH}     & \texttt{TRTOHH} + \texttt{TRTOHH\_LN} \\
+\texttt{TXTONHH}    & \texttt{TRTONHH} + \texttt{TRTONHH\_LN} \\
+\end{longtable}
+
+%% ── Variables used in this analysis ─────────────────────────────────────────
+\subsection*{Key Respondent-level Variables Used in This Analysis}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Why used} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUCASEID}    & Merge key --- all five files \\
+\rowcolor{rowgray} \texttt{TELFS}       & Employment status $\to$ employed/not-employed flag \\
+\texttt{TUFINLWGT}   & Survey weight --- all population-level estimates \\
+\rowcolor{rowgray} \texttt{TRCHILDNUM}  & Number of HH children $\to$ \texttt{has\_child\_hh} flag \\
+\end{longtable}
+
+%%%════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Roster File (\texttt{atusrost\_2024.dat}) --- 8 Variables}
+%%%════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[notebox]
+One row per household member per respondent. Used to identify the age of each
+person present during activities (linked via \texttt{TUCASEID} +
+\texttt{TULINENO} to the Who file). Key for the M2 child-present measure:
+check whether any roster person with \texttt{TEAGE} $< 18$ appears in the Who
+file for a given activity.
+\end{tcolorbox}
+
+\begin{longtable}{L{3cm} L{5.8cm} L{5.7cm}}
+\toprule
+\textbf{Variable} & \textbf{Description} & \textbf{Values} \\
+\midrule \endhead \bottomrule \endfoot
+\texttt{TUCASEID}  & ATUS Case ID & 14-digit string. Merge key \\
+\rowcolor{rowgray} \texttt{TULINENO}  & Person line number & Links to Who file \\
+\texttt{TEAGE}     & Age (edited) & In years \\
+\rowcolor{rowgray} \texttt{TERRP}     & Relationship to respondent (edited) &
+  18/19=Self; 20=Spouse; 21=Unmarried partner; 22=Own HH child;
+  23=Grandchild; 24=Parent; 25=Brother/sister; 26=Other relative;
+  27=Foster child; 28=Housemate; 29=Roomer/boarder; 30=Other nonrelative;
+  40=Own non-HH child $<18$ \\
+\texttt{TESEX}     & Sex (edited) & 1=Male; 2=Female \\
+\rowcolor{rowgray} \texttt{TXAGE}     & Allocation flag for \texttt{TEAGE}  & 0=No change; 1=Allocated \\
+\texttt{TXRRP}     & Allocation flag for \texttt{TERRP}  & 0=No change; 1=Allocated \\
+\rowcolor{rowgray} \texttt{TXSEX}     & Allocation flag for \texttt{TESEX}  & 0=No change; 1=Allocated \\
+\end{longtable}
+
+%%%════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Activity File (\texttt{atusact\_2024.dat}) --- 30 Variables}
+%%%════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[notebox]
+One row per activity episode per respondent (episode-level file).
+Key for constructing M1 (primary direct care minutes) and M2 (child-present
+minutes). \textbf{Always use \texttt{TUACTDUR24}} (not \texttt{TUACTDUR}):
+it truncates the last activity of the diary day at 4:00~a.m., which is the
+standard BLS convention for a diary day running 4:00~a.m.\ to 3:59~a.m.
+\end{tcolorbox}
+
+\subsection{Identifiers}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUCASEID}     & ATUS Case ID (14-digit identifier) --- merge key \\
+\rowcolor{rowgray} \texttt{TUACTIVITY\_N}& Activity line number --- merge key (links to Who file) \\
+\end{longtable}
+
+\subsection{Activity Classification}
+
+\begin{tcolorbox}[notebox]
+\small Tier codes are read into R as integers by \texttt{read\_csv()} ---
+\texttt{as.numeric()} in Part 4 confirms this. The Stata \texttt{.do} files use
+character strings with leading zeros; R does not. All numeric comparisons in the
+script use bare integers (e.g.\ \texttt{== 3}, \texttt{\%in\% 7:10}) which is
+correct for this environment.
+\end{tcolorbox}
+
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUTIER1CODE} & Tier 1 code: 1st and 2nd digits of 6-digit activity code
+                       (e.g., 01=Personal care, 05=Work, 03=Caring for HH members) \\
+\rowcolor{rowgray} \texttt{TUTIER2CODE} & Tier 2 code: 3rd and 4th digits of 6-digit activity code \\
+\texttt{TUTIER3CODE} & Tier 3 code: 5th and 6th digits of 6-digit activity code \\
+\rowcolor{rowgray} \texttt{TRCODE}      & Full six-digit activity code (combination of all three tiers) \\
+\texttt{TRTIER2}     & First and second activity tiers combined \\
+\end{longtable}
+
+\subsection{Activity Duration and Timing}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUACTDUR}    & Duration of activity in minutes --- last activity
+                       \emph{not} truncated at 4:00~a.m. \\
+\rowcolor{rowgray} \texttt{TUACTDUR24}  & Duration of activity in minutes --- last activity
+                       truncated at 4:00~a.m. \textbf{Use this variable for
+                       all analysis.} \\
+\texttt{TUCUMDUR}    & Cumulative duration of all activities, last activity not truncated \\
+\rowcolor{rowgray} \texttt{TUCUMDUR24}  & Cumulative duration of all activities, last activity
+                       truncated at 4:00~a.m. \\
+\texttt{TUSTARTTIM}  & Activity start time \\
+\rowcolor{rowgray} \texttt{TUSTOPTIME}  & Activity stop time \\
+\texttt{TUDURSTOP}   & How duration was reported (1=Duration entered directly,
+                       2=Stop time was entered) \\
+\end{longtable}
+
+\subsection{Location}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TEWHERE}  & Where was the respondent during this activity?
+  (1=Home, 2=Workplace, 3=Someone else's home, 4=Restaurant/bar,
+   5=Place of worship, 6=Grocery store, 7=Other store/mall,
+   8=School, 9=Outdoors, 10=Library, 11=Other place,
+   12=Car/driver, 13=Car/passenger \ldots) \\
+\rowcolor{rowgray} \texttt{TXWHERE}  & Allocation flag for \texttt{TEWHERE} \\
+\end{longtable}
+
+\subsection{Childcare During Activity (Yes/No Flags)}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUCC5}  & Was at least one own HH child $<$13 in your care during this
+                  activity? (0=No, 1=Yes, 97=No more childcare activities) \\
+\rowcolor{rowgray} \texttt{TUCC5B} & Was at least one non-own HH child $<$13 in your care during
+                  this activity? \\
+\texttt{TUCC7}  & Was at least one own non-HH child $<$13 in your care during
+                  this activity? \\
+\rowcolor{rowgray} \texttt{TUCC8}  & Was any other child 0--12 (not HH or own non-HH) in your care
+                  during this activity? \\
+\end{longtable}
+
+\subsection{Secondary Childcare Minutes --- Activity Level (\texttt{\_LN} = per activity line)}
+\begin{longtable}{L{3.8cm} L{10.7cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TRTCC\_LN}    & Secondary childcare minutes this activity ---
+                         HH and own non-HH children $<$13 \\
+\rowcolor{rowgray} \texttt{TRTCCTOT\_LN} & Secondary childcare minutes this activity ---
+                         all children $<$13 \\
+\texttt{TRTCOC\_LN}   & Secondary childcare minutes this activity ---
+                         non-own, non-HH children $<$13 \\
+\rowcolor{rowgray} \texttt{TRTHH\_LN}    & Secondary childcare minutes this activity ---
+                         HH children $<$13 \\
+\texttt{TRTNOHH\_LN}  & Secondary childcare minutes this activity ---
+                         non-own HH children $<$13 \\
+\rowcolor{rowgray} \texttt{TRTOHH\_LN}   & Secondary childcare minutes this activity ---
+                         own HH children $<$13 \\
+\texttt{TRTONHH\_LN}  & Secondary childcare minutes this activity ---
+                         own non-HH children $<$13 \\
+\rowcolor{rowgray} \texttt{TRTO\_LN}     & Secondary childcare minutes this activity ---
+                         own children $<$13 \\
+\texttt{TRTEC\_LN}    & Eldercare minutes provided during this activity \\
+\end{longtable}
+
+\subsection{Eldercare Flag}
+\begin{longtable}{L{3.5cm} L{11cm}}
+\toprule \textbf{Variable} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{TUEC24} & Was eldercare provided during this activity?
+                  (1=Yes, 96=All day, 97=No more activities) \\
+\end{longtable}
+
+%%%════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Who File (\texttt{atuswho\_2024.dat}) --- 5 Variables}
+%%%════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[notebox]
+One row per person present per activity episode. Used to construct the M2
+child-present measure: flag whether a person under 18 was present during
+each activity, then collapse to respondent level. \textbf{Important:}
+\texttt{TULINENO} $< 0$ means the entry is an aggregate category
+(e.g.\ ``all household members'') and cannot be linked to a specific row in
+the Roster file --- the resulting child-present measure is therefore a
+\emph{lower bound}.
+\end{tcolorbox}
+
+\begin{longtable}{L{3cm} L{4.5cm} L{7cm}}
+\toprule
+\textbf{Variable} & \textbf{Description} & \textbf{Values} \\
+\midrule \endhead \bottomrule \endfoot
+\texttt{TUCASEID}      & ATUS Case ID & 14-digit string. Merge key \\
+\rowcolor{rowgray} \texttt{TUACTIVITY\_N} & Activity line number &
+  Links back to Activity file \\
+\texttt{TULINENO}      & Person line number &
+  Links to Roster file. \textbf{Negative values = aggregate category;
+  cannot be linked to a specific person.} \\
+\rowcolor{rowgray} \texttt{TRWHONA}       & Who information not asked for this activity &
+  0 = \texttt{TUWHO\_CODE} was asked;\newline
+  1 = \texttt{TUWHO\_CODE} was not asked \\
+\texttt{TUWHO\_CODE}   & Who was present? &
+  18/19=Alone; 20=Spouse; 21=Unmarried partner; 22=Own HH child;
+  23=Grandchild; 24=Parent; 25=Brother/sister; 26=Other relative;
+  27=Foster child; 28=Housemate; 29=Roomer/boarder;
+  30=Other nonrelative; 40=Own non-HH child $<$18;
+  51=Non-HH parents; 52=Other non-HH family $<$18;
+  53=Other non-HH family 18+; 54=Friends;
+  56=Neighbours/acquaintances; 57=Other non-HH children $<$18;
+  58=Other non-HH adults; 59=Boss/manager;
+  60=People I supervise; 61=Co-workers; 62=Customers \\
+\end{longtable}
+
+%%%════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Activity Summary File (\texttt{atussum\_2024.dat}) --- 396 Variables}
+%%%════════════════════════════════════════════════════════════════════════════
+
+\begin{tcolorbox}[notebox]
+396 variables, 7{,}669 observations. One row per respondent.
+Columns 1--24 are demographic header variables (a subset of the Respondent
+file). Columns 25--396 are \textbf{activity time-use variables}: each gives
+the total minutes the respondent spent on that specific activity on the diary
+day. A value of 0 means the respondent did not do that activity --- it is a
+true zero, not missing. Merge key: \texttt{TUCASEID}.
+\end{tcolorbox}
+
+\subsection{Header Variables (Columns 1--24)}
+
+\begin{longtable}{L{3cm} L{5.5cm} L{6cm}}
+\toprule
+\textbf{Variable} & \textbf{Description} & \textbf{Values / Notes} \\
+\midrule \endhead \bottomrule \endfoot
+\texttt{TUCASEID}    & Case identification number &
+  14-digit string. Merge key across all 5 files \\
+\rowcolor{rowgray} \texttt{TUFINLWGT}   & Final person weight &
+  Use for all weighted population estimates \\
+\texttt{TRYHHCHILD}  & Age of youngest HH child under 18 &
+  $-1$ = no children under 18 in household \\
+\rowcolor{rowgray} \texttt{TEAGE}       & Age of respondent & In years \\
+\texttt{TESEX}       & Sex of respondent & 1=Male; 2=Female \\
+\rowcolor{rowgray} \texttt{PEEDUCA}     & Highest level of school completed &
+  CPS codes: 31=Less than 1st grade \ldots\ 46=Bachelor's \ldots\
+  47=Master's \ldots\ 49=Doctorate \\
+\texttt{PTDTRACE}    & Race (BLS edited) &
+  1=White only; 2=Black only; 3=AI/AN; 4=Asian only;
+  5=Hawaiian/PI; 6--26=Multi-race combinations \\
+\rowcolor{rowgray} \texttt{PEHSPNON}    & Hispanic / non-Hispanic &
+  1=Hispanic; 2=Non-Hispanic \\
+\texttt{GTMETSTA}    & Metropolitan status &
+  1=Metropolitan; 2=Non-metropolitan; 3=Not identified \\
+\rowcolor{rowgray} \texttt{TELFS}       & Labour force status &
+  1=Employed at work; 2=Employed absent;
+  3=Unemployed looking; 4=Unemployed on layoff;
+  5=Not in labour force \\
+\texttt{TEMJOT}      & Multiple jobholder &
+  1=Yes; 2=No; $-1$=Blank \\
+\rowcolor{rowgray} \texttt{TRDPFTPT}    & Full-time / part-time status of respondent &
+  1=Full time; 2=Part time; $-1$=Blank (not employed) \\
+\texttt{TESCHENR}    & School enrolment & 1=Yes; 2=No \\
+\rowcolor{rowgray} \texttt{TESCHLVL}    & Level of school enrolled in &
+  1=High school; 2=College or university; $-1$=Not enrolled \\
+\texttt{TRSPPRES}    & Spouse or partner presence in household &
+  1=Spouse present; 2=Unmarried partner present;
+  3=No spouse or partner \\
+\rowcolor{rowgray} \texttt{TESPEMPNOT}  & Employment status of spouse or partner &
+  1=Employed; 2=Not employed; $-1$=No spouse or partner \\
+\texttt{TRERNWA}     & Usual weekly earnings &
+  In dollars; $-1$=not asked or not applicable \\
+\rowcolor{rowgray} \texttt{TRCHILDNUM}  & Number of HH children under 18 &
+  \textbf{Negative values = item not collected; recode as \texttt{NA}
+  before analysis.} Valid: 0--99 \\
+\texttt{TRSPFTPT}    & Full-time / part-time status of spouse or partner &
+  1=Full time; 2=Part time; $-1$=Blank \\
+\rowcolor{rowgray} \texttt{TEHRUSLT}    & Usual hours worked per week &
+  $-1$=Blank or not asked \\
+\texttt{TUDIARYDAY}  & Day of week of diary day &
+  1=Sun; 2=Mon; 3=Tue; 4=Wed; 5=Thu; 6=Fri; 7=Sat \\
+\rowcolor{rowgray} \texttt{TRHOLIDAY}   & Whether diary day was a holiday &
+  0=Not a holiday; 1=Holiday \\
+\texttt{TRTEC}       & Total time in educational activities (primary) & Minutes \\
+\rowcolor{rowgray} \texttt{TRTHH}       & Total time in household activities (primary) & Minutes \\
+\end{longtable}
+
+%% ── Activity time-use variables ──────────────────────────────────────────────
+\subsection{Activity Time-Use Variables (Columns 25--396)}
+
+\textbf{Naming rule:}
+\texttt{t} + 2-digit tier~1 (major category) + 2-digit tier~2 + 2-digit tier~3.
+Each variable = total minutes on that activity on the diary day.
+
+\textit{Note: \texttt{t030107} is absent from the file --- that code was retired
+in an earlier ATUS wave. The jump from \texttt{t030106} to \texttt{t030108} is
+correct.}
+
+\subsubsection*{Major Category 01 --- Personal Care}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t010101} & Sleeping \\
+\rowcolor{rowgray} \texttt{t010102} & Sleeplessness \\
+\texttt{t010201} & Washing, dressing and grooming oneself \\
+\rowcolor{rowgray} \texttt{t010299} & Grooming, n.e.c. \\
+\texttt{t010301} & Health-related self care \\
+\rowcolor{rowgray} \texttt{t010399} & Self care, n.e.c. \\
+\texttt{t010401} & Personal / private activities \\
+\rowcolor{rowgray} \texttt{t010501} & Personal emergencies \\
+\texttt{t019999} & Personal care, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 02 --- Household Activities}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t020101} & Interior cleaning \\
+\rowcolor{rowgray} \texttt{t020102} & Laundry \\
+\texttt{t020103} & Sewing, repairing, and maintaining textiles \\
+\rowcolor{rowgray} \texttt{t020104} & Storing interior household items, including food \\
+\texttt{t020199} & Housework, n.e.c. \\
+\rowcolor{rowgray} \texttt{t020201} & Food and drink preparation \\
+\texttt{t020202} & Food presentation \\
+\rowcolor{rowgray} \texttt{t020203} & Kitchen and food clean-up \\
+\texttt{t020301} & Interior arrangement, decoration, and repairs \\
+\rowcolor{rowgray} \texttt{t020302} & Building and repairing furniture \\
+\texttt{t020303} & Heating and cooling \\
+\rowcolor{rowgray} \texttt{t020401} & Exterior cleaning \\
+\texttt{t020402} & Exterior repair, improvements, and decoration \\
+\rowcolor{rowgray} \texttt{t020499} & Exterior maintenance, repair and decoration, n.e.c. \\
+\texttt{t020501} & Lawn, garden, and houseplant care \\
+\rowcolor{rowgray} \texttt{t020502} & Ponds, pools, and hot tubs \\
+\texttt{t020599} & Lawn and garden, n.e.c. \\
+\rowcolor{rowgray} \texttt{t020601} & Care for animals and pets (not veterinary care) \\
+\texttt{t020602} & Walking, exercising, and playing with animals \\
+\rowcolor{rowgray} \texttt{t020699} & Pet and animal care, n.e.c. \\
+\texttt{t020701} & Vehicle repair and maintenance (by self) \\
+\rowcolor{rowgray} \texttt{t020799} & Vehicles, n.e.c. \\
+\texttt{t020801} & Appliance, tool, and toy set-up, repair, and maintenance (by self) \\
+\rowcolor{rowgray} \texttt{t020899} & Appliances and tools, n.e.c. \\
+\texttt{t020901} & Financial management \\
+\rowcolor{rowgray} \texttt{t020902} & Household and personal organisation and planning \\
+\texttt{t020903} & Household and personal mail and messages (not e-mail) \\
+\rowcolor{rowgray} \texttt{t020904} & Household and personal e-mail and messages \\
+\texttt{t020905} & Home security \\
+\rowcolor{rowgray} \texttt{t020999} & Household management, n.e.c. \\
+\texttt{t029999} & Household activities, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 03 --- Caring For and Helping Household Members}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\multicolumn{2}{l}{\textit{Sub-category 0301 --- Caring For and Helping Household Children}} \\[2pt]
+\texttt{t030101} & Physical care for household children \\
+\rowcolor{rowgray} \texttt{t030102} & Reading to and with household children \\
+\texttt{t030103} & Playing with household children (not sports) \\
+\rowcolor{rowgray} \texttt{t030104} & Arts and crafts with household children \\
+\texttt{t030105} & Playing sports with household children \\
+\rowcolor{rowgray} \texttt{t030106} & Talking with and listening to household children \\
+\texttt{t030108} & Organisation and planning for household children \\
+\rowcolor{rowgray} \texttt{t030109} & Looking after household children as primary activity \\
+\texttt{t030110} & Attending household children's events \\
+\rowcolor{rowgray} \texttt{t030111} & Waiting for and with household children \\
+\texttt{t030112} & Picking up and dropping off household children \\
+\rowcolor{rowgray} \texttt{t030199} & Caring for and helping household children, n.e.c. \\[4pt]
+\multicolumn{2}{l}{\textit{Sub-category 0302 --- Activities Related to Household Children's Education}} \\[2pt]
+\texttt{t030201} & Homework --- helping household child \\
+\rowcolor{rowgray} \texttt{t030202} & Meetings and school conferences for household children \\
+\texttt{t030203} & Home schooling of household children \\
+\rowcolor{rowgray} \texttt{t030299} & Activities related to household child's education, n.e.c. \\[4pt]
+\multicolumn{2}{l}{\textit{Sub-category 0303 --- Activities Related to Household Children's Health}} \\[2pt]
+\texttt{t030301} & Providing medical care to household children \\
+\rowcolor{rowgray} \texttt{t030302} & Obtaining medical care for household children \\
+\texttt{t030303} & Waiting associated with household children's health \\
+\rowcolor{rowgray} \texttt{t030399} & Activities related to household child's health, n.e.c. \\[4pt]
+\multicolumn{2}{l}{\textit{Sub-category 0304 --- Caring For Household Adults}} \\[2pt]
+\texttt{t030401} & Physical care for household adults \\
+\rowcolor{rowgray} \texttt{t030402} & Looking after household adult as primary activity \\
+\texttt{t030403} & Providing medical care to household adult \\
+\rowcolor{rowgray} \texttt{t030404} & Obtaining medical and care services for household adult \\
+\texttt{t030405} & Waiting associated with caring for household adults \\
+\rowcolor{rowgray} \texttt{t030499} & Caring for household adults, n.e.c. \\[4pt]
+\multicolumn{2}{l}{\textit{Sub-category 0305 --- Helping Household Adults}} \\[2pt]
+\texttt{t030501} & Helping household adults \\
+\rowcolor{rowgray} \texttt{t030502} & Organisation and planning for household adults \\
+\texttt{t030503} & Picking up and dropping off household adult \\
+\rowcolor{rowgray} \texttt{t030504} & Waiting associated with helping household adults \\
+\texttt{t030599} & Helping household adults, n.e.c. \\
+\rowcolor{rowgray} \texttt{t039999} & Caring for and helping household members, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 04 --- Caring For and Helping Non-Household Members}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\multicolumn{2}{l}{\textit{Sub-category 0401 --- Caring For and Helping Non-Household Children}} \\[2pt]
+\texttt{t040101} & Physical care for non-household children \\
+\rowcolor{rowgray} \texttt{t040102} & Reading to and with non-household children \\
+\texttt{t040103} & Playing with non-household children (not sports) \\
+\rowcolor{rowgray} \texttt{t040104} & Arts and crafts with non-household children \\
+\texttt{t040105} & Playing sports with non-household children \\
+\rowcolor{rowgray} \texttt{t040106} & Talking with and listening to non-household children \\
+\texttt{t040108} & Organisation and planning for non-household children \\
+\rowcolor{rowgray} \texttt{t040109} & Looking after non-household children as primary activity \\
+\texttt{t040110} & Attending non-household children's events \\
+\rowcolor{rowgray} \texttt{t040111} & Waiting for and with non-household children \\
+\texttt{t040112} & Dropping off and picking up non-household children \\
+\rowcolor{rowgray} \texttt{t040199} & Caring for and helping non-household children, n.e.c. \\[4pt]
+\multicolumn{2}{l}{\textit{Sub-category 0402 --- Activities Related to Non-Household Children's Education}} \\[2pt]
+\texttt{t040201} & Homework --- helping non-household children \\
+\rowcolor{rowgray} \texttt{t040203} & Home schooling of non-household children \\
+\texttt{t040299} & Activities related to non-household child's education, n.e.c. \\[4pt]
+\multicolumn{2}{l}{\textit{Sub-category 0403 --- Activities Related to Non-Household Children's Health}} \\[2pt]
+\rowcolor{rowgray} \texttt{t040301} & Providing medical care to non-household children \\
+\texttt{t040302} & Obtaining medical care for non-household children \\
+\rowcolor{rowgray} \texttt{t040303} & Waiting associated with non-household children's health \\[4pt]
+\multicolumn{2}{l}{\textit{Sub-category 0404 --- Caring For Non-Household Adults}} \\[2pt]
+\texttt{t040401} & Physical care for non-household adults \\
+\rowcolor{rowgray} \texttt{t040402} & Looking after non-household adult as primary activity \\
+\texttt{t040403} & Providing medical care to non-household adult \\
+\rowcolor{rowgray} \texttt{t040404} & Obtaining medical and care services for non-household adult \\
+\texttt{t040405} & Waiting associated with caring for non-household adults \\
+\rowcolor{rowgray} \texttt{t040499} & Caring for non-household adults, n.e.c. \\[4pt]
+\multicolumn{2}{l}{\textit{Sub-category 0405 --- Helping Non-Household Adults}} \\[2pt]
+\texttt{t040501} & Housework, cooking, and shopping assistance for non-household adults \\
+\rowcolor{rowgray} \texttt{t040502} & House and lawn maintenance and repair assistance (non-household) \\
+\texttt{t040503} & Animal and pet care assistance for non-household adults \\
+\rowcolor{rowgray} \texttt{t040504} & Vehicle and appliance maintenance and repair assistance \\
+\texttt{t040505} & Financial management assistance for non-household adults \\
+\rowcolor{rowgray} \texttt{t040506} & Household management and paperwork assistance (non-household) \\
+\texttt{t040507} & Picking up and dropping off non-household adult \\
+\rowcolor{rowgray} \texttt{t040508} & Waiting associated with helping non-household adults \\
+\texttt{t040599} & Helping non-household adults, n.e.c. \\
+\rowcolor{rowgray} \texttt{t049999} & Caring for and helping non-household members, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 05 --- Work and Work-Related Activities}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t050101} & Work, main job \\
+\rowcolor{rowgray} \texttt{t050102} & Work, other job(s) \\
+\texttt{t050104} & Waiting associated with working \\
+\rowcolor{rowgray} \texttt{t050199} & Working, n.e.c. \\
+\texttt{t050201} & Socialising, relaxing, and leisure as part of job \\
+\rowcolor{rowgray} \texttt{t050202} & Eating and drinking as part of job \\
+\texttt{t050203} & Sports and exercise as part of job \\
+\rowcolor{rowgray} \texttt{t050205} & Waiting associated with work-related activities \\
+\texttt{t050301} & Income-generating hobbies, crafts, and food \\
+\rowcolor{rowgray} \texttt{t050302} & Income-generating performances \\
+\texttt{t050303} & Income-generating services \\
+\rowcolor{rowgray} \texttt{t050304} & Income-generating rental property activities \\
+\texttt{t050305} & Waiting associated with other income-generating activities \\
+\rowcolor{rowgray} \texttt{t050399} & Other income-generating activities, n.e.c. \\
+\texttt{t050401} & Job search activities \\
+\rowcolor{rowgray} \texttt{t050403} & Job interviewing \\
+\texttt{t059999} & Work and work-related activities, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 06 --- Education}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t060101} & Taking class for degree, certification, or licensure \\
+\rowcolor{rowgray} \texttt{t060102} & Taking class for personal interest \\
+\texttt{t060103} & Waiting associated with taking classes \\
+\rowcolor{rowgray} \texttt{t060104} & Security procedures related to taking classes \\
+\texttt{t060199} & Taking class, n.e.c. \\
+\rowcolor{rowgray} \texttt{t060201} & Extracurricular club activities \\
+\texttt{t060202} & Extracurricular music and performance activities \\
+\rowcolor{rowgray} \texttt{t060299} & Education-related extracurricular activities, n.e.c. \\
+\texttt{t060301} & Research and homework for degree, certification, or licensure \\
+\rowcolor{rowgray} \texttt{t060302} & Research and homework for personal interest \\
+\texttt{t060399} & Research and homework, n.e.c. \\
+\rowcolor{rowgray} \texttt{t060401} & Administrative activities --- class for degree or certification \\
+\texttt{t060402} & Administrative activities --- class for personal interest \\
+\rowcolor{rowgray} \texttt{t060499} & Administrative for education, n.e.c. \\
+\texttt{t069999} & Education, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 07 --- Consumer Purchases}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t070101} & Grocery shopping \\
+\rowcolor{rowgray} \texttt{t070102} & Purchasing gas \\
+\texttt{t070103} & Purchasing food (not groceries) \\
+\rowcolor{rowgray} \texttt{t070104} & Shopping, except groceries, food and gas \\
+\texttt{t070105} & Waiting associated with shopping \\
+\rowcolor{rowgray} \texttt{t070199} & Shopping, n.e.c. \\
+\texttt{t070201} & Comparison shopping and researching purchases \\
+\end{longtable}
+
+\subsubsection*{Major Category 08 --- Professional and Personal Care Services}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t080101} & Using paid childcare services \\
+\rowcolor{rowgray} \texttt{t080102} & Waiting associated with purchasing childcare services \\
+\texttt{t080201} & Banking \\
+\rowcolor{rowgray} \texttt{t080202} & Using other financial services \\
+\texttt{t080203} & Waiting associated with banking and financial services \\
+\rowcolor{rowgray} \texttt{t080299} & Using financial services and banking, n.e.c. \\
+\texttt{t080301} & Using legal services \\
+\rowcolor{rowgray} \texttt{t080401} & Using health and care services outside the home \\
+\texttt{t080402} & Using in-home health and care services \\
+\rowcolor{rowgray} \texttt{t080403} & Waiting associated with medical services \\
+\texttt{t080499} & Using medical services, n.e.c. \\
+\rowcolor{rowgray} \texttt{t080501} & Using personal care services \\
+\texttt{t080502} & Waiting associated with personal care services \\
+\rowcolor{rowgray} \texttt{t080601} & Activities related to purchasing and selling real estate \\
+\texttt{t080701} & Using veterinary services \\
+\rowcolor{rowgray} \texttt{t080702} & Waiting associated with veterinary services \\
+\texttt{t089999} & Professional and personal services, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 09 --- Household Services}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t090101} & Using interior cleaning services \\
+\rowcolor{rowgray} \texttt{t090102} & Using meal preparation services \\
+\texttt{t090103} & Using clothing repair and cleaning services \\
+\rowcolor{rowgray} \texttt{t090199} & Using household services, n.e.c. \\
+\texttt{t090201} & Using home maintenance, repair, and construction services \\
+\rowcolor{rowgray} \texttt{t090202} & Waiting associated with home maintenance, repair, and construction \\
+\texttt{t090301} & Using pet services (not veterinary) \\
+\rowcolor{rowgray} \texttt{t090302} & Waiting associated with pet services \\
+\texttt{t090401} & Using lawn and garden services \\
+\rowcolor{rowgray} \texttt{t090402} & Waiting associated with lawn and garden services \\
+\texttt{t090501} & Using vehicle maintenance and repair services \\
+\rowcolor{rowgray} \texttt{t090502} & Waiting associated with vehicle maintenance and repair services \\
+\texttt{t090599} & Using household services, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 10 --- Government Services and Civic Obligations}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t100102} & Using social services \\
+\rowcolor{rowgray} \texttt{t100103} & Obtaining licences and paying fines, fees, and taxes \\
+\texttt{t100199} & Using government services, n.e.c. \\
+\rowcolor{rowgray} \texttt{t100201} & Civic obligations and participation \\
+\texttt{t100299} & Civic obligations, n.e.c. \\
+\rowcolor{rowgray} \texttt{t100304} & Waiting associated with government services \\
+\texttt{t100305} & Security procedures related to government services \\
+\end{longtable}
+
+\subsubsection*{Major Category 11 --- Eating and Drinking}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t110101} & Eating and drinking \\
+\rowcolor{rowgray} \texttt{t110201} & Waiting associated with eating and drinking \\
+\end{longtable}
+
+\subsubsection*{Major Category 12 --- Socializing, Relaxing, and Leisure}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t120101} & Socialising and communicating with others \\
+\rowcolor{rowgray} \texttt{t120201} & Attending or hosting parties, receptions, and ceremonies \\
+\texttt{t120202} & Attending meetings for personal interest (not volunteering) \\
+\rowcolor{rowgray} \texttt{t120299} & Attending and hosting social events, n.e.c. \\
+\texttt{t120301} & Relaxing and thinking \\
+\rowcolor{rowgray} \texttt{t120302} & Tobacco and drug use \\
+\texttt{t120303} & Television and movies (not religious) \\
+\rowcolor{rowgray} \texttt{t120304} & Television (religious) \\
+\texttt{t120305} & Listening to the radio \\
+\rowcolor{rowgray} \texttt{t120306} & Listening to and playing music (not radio) \\
+\texttt{t120307} & Playing games \\
+\rowcolor{rowgray} \texttt{t120308} & Computer use for leisure (excluding games) \\
+\texttt{t120309} & Arts and crafts as a hobby \\
+\rowcolor{rowgray} \texttt{t120310} & Collecting as a hobby \\
+\texttt{t120311} & Hobbies, except arts and crafts and collecting \\
+\rowcolor{rowgray} \texttt{t120312} & Reading for personal interest \\
+\texttt{t120313} & Writing for personal interest \\
+\rowcolor{rowgray} \texttt{t120399} & Relaxing and leisure, n.e.c. \\
+\texttt{t120401} & Attending performing arts \\
+\rowcolor{rowgray} \texttt{t120402} & Attending museums \\
+\texttt{t120403} & Attending movies and film \\
+\rowcolor{rowgray} \texttt{t120404} & Attending gambling establishments \\
+\texttt{t120499} & Arts and entertainment, n.e.c. \\
+\rowcolor{rowgray} \texttt{t120501} & Waiting associated with socialising and communicating \\
+\texttt{t120504} & Waiting associated with arts and entertainment \\
+\rowcolor{rowgray} \texttt{t129999} & Socialising, relaxing, and leisure, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 13 --- Sports, Exercise, and Recreation}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t130101} & Doing aerobics \\
+\rowcolor{rowgray} \texttt{t130102} & Playing baseball \\
+\texttt{t130103} & Playing basketball \\
+\rowcolor{rowgray} \texttt{t130104} & Biking \\
+\texttt{t130105} & Playing billiards \\
+\rowcolor{rowgray} \texttt{t130106} & Boating \\
+\texttt{t130107} & Bowling \\
+\rowcolor{rowgray} \texttt{t130108} & Climbing, spelunking, and caving \\
+\texttt{t130109} & Dancing \\
+\rowcolor{rowgray} \texttt{t130110} & Participating in equestrian sports \\
+\texttt{t130112} & Fencing \\
+\rowcolor{rowgray} \texttt{t130113} & Fishing \\
+\texttt{t130114} & Playing football \\
+\rowcolor{rowgray} \texttt{t130116} & Golfing \\
+\texttt{t130117} & Doing gymnastics \\
+\rowcolor{rowgray} \texttt{t130118} & Hiking \\
+\texttt{t130119} & Playing hockey \\
+\rowcolor{rowgray} \texttt{t130120} & Hunting \\
+\texttt{t130122} & Participating in martial arts \\
+\rowcolor{rowgray} \texttt{t130124} & Playing racquet sports \\
+\texttt{t130125} & Participating in rodeo competitions \\
+\rowcolor{rowgray} \texttt{t130126} & Roller skating, inline skating, and skateboarding \\
+\texttt{t130127} & Playing rugby \\
+\rowcolor{rowgray} \texttt{t130128} & Running \\
+\texttt{t130129} & Skiing, ice skating, and snowboarding \\
+\rowcolor{rowgray} \texttt{t130130} & Playing soccer \\
+\texttt{t130131} & Softball \\
+\rowcolor{rowgray} \texttt{t130132} & Using cardiovascular equipment \\
+\texttt{t130133} & Vehicle touring and racing \\
+\rowcolor{rowgray} \texttt{t130134} & Playing volleyball \\
+\texttt{t130135} & Walking \\
+\rowcolor{rowgray} \texttt{t130136} & Participating in water sports \\
+\texttt{t130199} & Playing sports, n.e.c. \\
+\rowcolor{rowgray} \texttt{t130202} & Watching baseball \\
+\texttt{t130203} & Watching basketball \\
+\rowcolor{rowgray} \texttt{t130204} & Watching biking \\
+\texttt{t130210} & Watching equestrian sports \\
+\rowcolor{rowgray} \texttt{t130213} & Watching football \\
+\texttt{t130216} & Watching hockey \\
+\rowcolor{rowgray} \texttt{t130218} & Watching racquet sports \\
+\texttt{t130219} & Watching rodeo competitions \\
+\rowcolor{rowgray} \texttt{t130222} & Watching running \\
+\texttt{t130224} & Watching soccer \\
+\rowcolor{rowgray} \texttt{t130225} & Watching softball \\
+\texttt{t130226} & Watching vehicle touring and racing \\
+\rowcolor{rowgray} \texttt{t130227} & Watching volleyball \\
+\texttt{t130232} & Watching wrestling \\
+\rowcolor{rowgray} \texttt{t130299} & Attending sporting events, n.e.c. \\
+\texttt{t130301} & Waiting associated with playing sports or exercising \\
+\rowcolor{rowgray} \texttt{t130302} & Waiting associated with attending sporting events \\
+\end{longtable}
+
+\subsubsection*{Major Category 14 --- Religious and Spiritual Activities}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t140101} & Attending religious services \\
+\rowcolor{rowgray} \texttt{t140102} & Participation in religious practices \\
+\texttt{t140103} & Waiting associated with religious and spiritual activities \\
+\rowcolor{rowgray} \texttt{t140105} & Religious education activities \\
+\end{longtable}
+
+\subsubsection*{Major Category 15 --- Volunteer Activities}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t150101} & Computer use --- volunteer \\
+\rowcolor{rowgray} \texttt{t150102} & Organising and preparing --- volunteer \\
+\texttt{t150103} & Reading --- volunteer \\
+\rowcolor{rowgray} \texttt{t150104} & Telephone calls, except hotline --- volunteer \\
+\texttt{t150105} & Writing --- volunteer \\
+\rowcolor{rowgray} \texttt{t150106} & Fundraising --- volunteer \\
+\texttt{t150199} & Administrative and support activities, n.e.c.\ --- volunteer \\
+\rowcolor{rowgray} \texttt{t150201} & Food preparation, presentation, and clean-up --- volunteer \\
+\texttt{t150202} & Collecting and delivering clothing and other goods --- volunteer \\
+\rowcolor{rowgray} \texttt{t150203} & Providing care --- volunteer \\
+\texttt{t150204} & Teaching, leading, counselling, and mentoring --- volunteer \\
+\rowcolor{rowgray} \texttt{t150299} & Social service and care activities, n.e.c.\ --- volunteer \\
+\texttt{t150301} & Building houses, wildlife sites, and other structures --- volunteer \\
+\rowcolor{rowgray} \texttt{t150302} & Indoor and outdoor maintenance, repair, and clean-up --- volunteer \\
+\texttt{t150401} & Performing --- volunteer \\
+\rowcolor{rowgray} \texttt{t150402} & Serving at volunteer events and cultural activities \\
+\texttt{t150499} & Participating in performance and cultural activities, n.e.c.\ --- volunteer \\
+\rowcolor{rowgray} \texttt{t150501} & Attending meetings, conferences, and training --- volunteer \\
+\texttt{t150601} & Public health activities --- volunteer \\
+\rowcolor{rowgray} \texttt{t150602} & Public safety activities --- volunteer \\
+\texttt{t150701} & Waiting associated with volunteer activities \\
+\rowcolor{rowgray} \texttt{t150801} & Security procedures related to volunteer activities \\
+\texttt{t150899} & Security procedures, volunteer activities, n.e.c. \\
+\rowcolor{rowgray} \texttt{t159999} & Volunteer activities, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 16 --- Telephone Calls}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t160101} & Telephone calls to and from family members \\
+\rowcolor{rowgray} \texttt{t160102} & Telephone calls to and from friends, neighbours, or acquaintances \\
+\texttt{t160103} & Telephone calls to and from education services providers \\
+\rowcolor{rowgray} \texttt{t160104} & Telephone calls to and from salespeople \\
+\texttt{t160105} & Telephone calls to and from professional or personal care service providers \\
+\rowcolor{rowgray} \texttt{t160106} & Telephone calls to and from household services providers \\
+\texttt{t160107} & Telephone calls to and from paid child or adult care providers \\
+\rowcolor{rowgray} \texttt{t160108} & Telephone calls to and from government officials \\
+\texttt{t160199} & Telephone calls, n.e.c. \\
+\rowcolor{rowgray} \texttt{t160201} & Waiting associated with telephone calls \\
+\end{longtable}
+
+\subsubsection*{Major Category 18 --- Traveling}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t180101} & Travel related to personal care \\
+\rowcolor{rowgray} \texttt{t180201} & Travel related to housework \\
+\texttt{t180202} & Travel related to food preparation and clean-up \\
+\rowcolor{rowgray} \texttt{t180203} & Travel related to interior maintenance \\
+\texttt{t180204} & Travel related to exterior maintenance \\
+\rowcolor{rowgray} \texttt{t180205} & Travel related to lawn, garden, and houseplants \\
+\texttt{t180206} & Travel related to care for animals and pets \\
+\rowcolor{rowgray} \texttt{t180207} & Travel related to vehicle care (by self) \\
+\texttt{t180208} & Travel related to appliance and tool maintenance (by self) \\
+\rowcolor{rowgray} \texttt{t180209} & Travel related to household management \\
+\texttt{t180299} & Travel related to household activities, n.e.c. \\
+\rowcolor{rowgray} \texttt{t180301} & Travel related to caring for and helping household children \\
+\texttt{t180302} & Travel related to household children's education \\
+\rowcolor{rowgray} \texttt{t180303} & Travel related to household children's health \\
+\texttt{t180304} & Travel related to caring for household adults \\
+\rowcolor{rowgray} \texttt{t180305} & Travel related to helping household adults \\
+\texttt{t180401} & Travel related to caring for and helping non-household children \\
+\rowcolor{rowgray} \texttt{t180402} & Travel related to non-household children's education \\
+\texttt{t180403} & Travel related to non-household children's health \\
+\rowcolor{rowgray} \texttt{t180404} & Travel related to caring for non-household adults \\
+\texttt{t180405} & Travel related to helping non-household adults \\
+\rowcolor{rowgray} \texttt{t180499} & Travel related to caring for non-household members, n.e.c. \\
+\texttt{t180501} & Travel related to working \\
+\rowcolor{rowgray} \texttt{t180502} & Travel related to work-related activities \\
+\texttt{t180503} & Travel related to income-generating activities \\
+\rowcolor{rowgray} \texttt{t180504} & Travel related to job search and interviewing \\
+\texttt{t180599} & Travel related to work, n.e.c. \\
+\rowcolor{rowgray} \texttt{t180601} & Travel related to taking class \\
+\texttt{t180602} & Travel related to extracurricular activities \\
+\rowcolor{rowgray} \texttt{t180603} & Travel related to research and homework \\
+\texttt{t180604} & Travel related to administrative activities for education \\
+\rowcolor{rowgray} \texttt{t180699} & Travel related to education, n.e.c. \\
+\texttt{t180701} & Travel related to grocery shopping \\
+\rowcolor{rowgray} \texttt{t180702} & Travel related to purchasing gas \\
+\texttt{t180703} & Travel related to purchasing food (not groceries) \\
+\rowcolor{rowgray} \texttt{t180704} & Travel related to shopping (excluding groceries, food, and gas) \\
+\texttt{t180799} & Travel related to consumer purchases, n.e.c. \\
+\rowcolor{rowgray} \texttt{t180801} & Travel related to using childcare services \\
+\texttt{t180802} & Travel related to using financial services \\
+\rowcolor{rowgray} \texttt{t180803} & Travel related to using legal services \\
+\texttt{t180804} & Travel related to using medical services \\
+\rowcolor{rowgray} \texttt{t180805} & Travel related to using personal care services \\
+\texttt{t180806} & Travel related to purchasing and selling real estate \\
+\rowcolor{rowgray} \texttt{t180807} & Travel related to using veterinary services \\
+\texttt{t180899} & Travel related to professional and personal services, n.e.c. \\
+\rowcolor{rowgray} \texttt{t180901} & Travel related to using interior cleaning services \\
+\texttt{t180902} & Travel related to using home maintenance and repair services \\
+\rowcolor{rowgray} \texttt{t180903} & Travel related to using pet services \\
+\texttt{t180904} & Travel related to using lawn and garden services \\
+\rowcolor{rowgray} \texttt{t180905} & Travel related to using vehicle maintenance and repair services \\
+\texttt{t181001} & Travel related to using government services \\
+\rowcolor{rowgray} \texttt{t181002} & Travel related to civic obligations \\
+\texttt{t181101} & Travel related to eating and drinking \\
+\rowcolor{rowgray} \texttt{t181201} & Travel related to socialising and communicating \\
+\texttt{t181202} & Travel related to relaxing and leisure \\
+\rowcolor{rowgray} \texttt{t181203} & Travel related to arts and entertainment \\
+\texttt{t181204} & Travel related to attending sporting events \\
+\rowcolor{rowgray} \texttt{t181205} & Travel related to attending movies and film \\
+\texttt{t181299} & Travel related to socialising, relaxing, and leisure, n.e.c. \\
+\rowcolor{rowgray} \texttt{t181301} & Travel related to participating in sports and exercise \\
+\texttt{t181302} & Travel related to attending sporting events (other) \\
+\rowcolor{rowgray} \texttt{t181399} & Travel related to sports, exercise, and recreation, n.e.c. \\
+\texttt{t181401} & Travel related to religious and spiritual activities \\
+\rowcolor{rowgray} \texttt{t181501} & Travel related to volunteer activities \\
+\texttt{t181599} & Travel related to volunteer activities, n.e.c. \\
+\rowcolor{rowgray} \texttt{t181601} & Travel related to telephone calls \\
+\texttt{t181801} & Security procedures related to traveling \\
+\rowcolor{rowgray} \texttt{t189999} & Traveling, n.e.c. \\
+\end{longtable}
+
+\subsubsection*{Major Category 50 --- Data Codes (Exclude from All Analysis)}
+\begin{longtable}{L{3cm} L{11.5cm}}
+\toprule \textbf{Code} & \textbf{Description} \\ \midrule \endhead
+\bottomrule \endfoot
+\texttt{t500101} & Insufficient detail in verbatim \\
+\rowcolor{rowgray} \texttt{t500103} & Missing travel or destination \\
+\texttt{t500105} & Respondent refused to provide information \\
+\rowcolor{rowgray} \texttt{t500106} & Gap or cannot remember \\
+\texttt{t500107} & Unable to code activity at first tier \\
+\rowcolor{rowgray} \texttt{t509999} & Data codes, n.e.c. \\
+\end{longtable}
+
+\end{document}
