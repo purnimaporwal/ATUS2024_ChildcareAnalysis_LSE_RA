@@ -117,7 +117,6 @@ Becker, G. S. (1965). A Theory of the Allocation of Time. *The Economic Journal*
 Bureau of Labor Statistics (2024). *American Time Use Survey User's Guide*. U.S. Department of Labor.
 
 ---
----
 
 ## Completion-Time Log
 
