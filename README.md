@@ -117,7 +117,19 @@ Becker, G. S. (1965). A Theory of the Allocation of Time. *The Economic Journal*
 Bureau of Labor Statistics (2024). *American Time Use Survey User's Guide*. U.S. Department of Labor.
 
 ---
+---
 
+## Completion-Time Log
+
+| Part | Approximate time |
+|------|-----------------|
+| Part 1 — Writing task | ~30 minutes |
+| Part 2 — Data task | ~7.5–8 hours |
+| **Total** | **~8–8.5 hours** |
+
+Part 2 includes: reading documentation, downloading and importing data, cleaning and merging, debugging, using AI tools, producing outputs, writing the report, and preparing the replication package.
+
+---
 ## Contact
 
 Purnima Porwal — porwal.purnima18@gmail.com
