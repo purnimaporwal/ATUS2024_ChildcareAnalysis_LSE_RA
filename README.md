@@ -1,6 +1,5 @@
 # ATUS 2024 — Parental Childcare Availability
-**LSE RA Assessment | Part 2: Data Task**  
-Purnima Porwal | June 2026
+**LSE RA Assessment | Part 2: Data Task** Purnima Porwal | June 2026
 
 ---
 
@@ -10,7 +9,7 @@ This replication package constructs and analyses two measures of parental childc
 - **M1 — Direct childcare**: hands-on care activities (ATUS tier codes 0301xx / 0401xx)
 - **M2 — Child-present time**: any activity where a child was present (TUWHO_CODE)
 
-The analysis compares M1 and M2 by parent sex (Fathers vs Mothers) and examines how much broader child-present time is relative to direct care.
+The analysis compares M1 and M2 by parent sex (Fathers vs Mothers) and examines how much broader child present time is relative to direct care.
 
 The gap between M1 and M2 is the same question I have encountered in other data contexts — what a survey records as care, versus what actually constitutes being available to a child. Direct childcare codes capture hands-on investment time. Child-present time captures something closer to what a child experiences as parental presence. Neither is wrong; they measure different things, and that difference is the point of the analysis.
 
@@ -75,9 +74,9 @@ All outputs are saved to the output/ folder when the script is run.
 .csv files are the same tables in spreadsheet format.  
 `becker_cat_table.csv`, `m1_codes_table.csv`, and `m2_codes_table.csv` also serve as activity-code crosswalks linking raw ATUS tier codes to the M1 and M2 analysis measures.
 
-A `clean dataset/` folder is also created automatically to store `atus_merged.rds`, the cleaned activity-level dataset used from Step 3.3 onwards. `atus_merged.rds` is included in the repository. To skip Steps 3.1–3.2 and load directly from Step 3.3 onwards, run:
+A `clean_dataset/` folder is also created automatically to store `atus_merged.rds`, the cleaned activity-level dataset used from Step 3.3 onwards. `atus_merged.rds` is included in the repository. To skip Steps 3.1–3.2 and load directly from Step 3.3 onwards, run:
 
-    atus_merged <- readRDS(here("clean dataset", "atus_merged.rds"))
+    atus_merged <- readRDS(here("clean_dataset", "atus_merged.rds"))
 
 ---
 
@@ -104,11 +103,7 @@ A `clean dataset/` folder is also created automatically to store `atus_merged.rd
 
 ## Status
 
-Analysis completed June 2026 as part of the LSE RA assessment task.
-All outputs in the output/ folder were generated from the script and
-are included here for verification. The raw ATUS files are not
-included — they are too large to commit and are freely available from
-the BLS link above.
+Analysis completed June 2026 as part of the LSE RA assessment task. All outputs in the output/ folder were generated from the script and are included here for verification. The raw ATUS files are not included — they are too large to commit and are freely available from the BLS link above.
 
 ---
 
