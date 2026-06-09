@@ -74,7 +74,7 @@ All outputs are saved to the output/ folder when the script is run.
 .csv files are the same tables in spreadsheet format.  
 `becker_cat_table.csv`, `m1_codes_table.csv`, and `m2_codes_table.csv` also serve as activity-code crosswalks linking raw ATUS tier codes to the M1 and M2 analysis measures.
 
-A `clean_dataset/` folder is also created automatically to store `atus_merged.rds`, the cleaned activity-level dataset used from Step 3.3 onwards. `atus_merged.rds` is included in the repository. To skip Steps 3.1–3.2 and load directly from Step 3.3 onwards, run:
+A `clean dataset/` folder is also created automatically to store `atus_merged.rds`, the cleaned activity-level dataset used from Step 3.3 onwards. `atus_merged.rds` is included in the repository. To skip Steps 3.1–3.2 and load directly from Step 3.3 onwards, run:
 
     atus_merged <- readRDS(here("clean dataset", "atus_merged.rds"))
 
