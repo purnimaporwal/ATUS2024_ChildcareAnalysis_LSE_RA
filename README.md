@@ -76,7 +76,7 @@ All outputs are saved to the output/ folder when the script is run.
 
 A `clean_dataset/` folder is also created automatically to store `atus_merged.rds`, the cleaned activity-level dataset used from Step 3.3 onwards. `atus_merged.rds` is included in the repository. To skip Steps 3.1–3.2 and load directly from Step 3.3 onwards, run:
 
-    atus_merged <- readRDS(here("clean_dataset", "atus_merged.rds"))
+    atus_merged <- readRDS(here("clean dataset", "atus_merged.rds"))
 
 ---
 
